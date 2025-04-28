@@ -6,7 +6,6 @@
 //
 
 import Foundation
-
 // MARK: - NetworkManager
 
 /// A generic network manager for handling HTTP requests.

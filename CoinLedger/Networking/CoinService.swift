@@ -8,19 +8,85 @@
 import Foundation
 
 // MARK: - CoinService
+/// Handles all networking related to Coins
 
-/// A service responsible for fetching coin data from the API.
-class CoinService {
+struct CoinService {
+    private let baseURL = "https://api.coinranking.com/v2"
 
-    private let networkManager = NetworkManager()
-    
-    private let baseURL = URL(string: "https://api.coinranking.com/v2/coins")!
-    
-    /// Fetches a paginated list of coins.
-    /// - Parameter page: The page number to fetch.
-    /// - Returns: A list of coins and total stats.
-    func fetchCoins(page: Int) async throws -> CoinListResponse {
-        let url = baseURL.appending("page=\(page)&limit=20")
-        return try await networkManager.fetchData(from: url)
+    /// Fetches a list of coins with optional sorting and pagination
+    func fetchCoins(limit: Int, offset: Int, sortOption: CoinListSortOption = .none) async throws -> CoinListResponse {
+        var urlComponents = URLComponents(string: "\(baseURL)/coins")!
+        
+        var queryItems: [URLQueryItem] = [
+            URLQueryItem(name: "limit", value: "\(limit)"),
+            URLQueryItem(name: "offset", value: "\(offset)")
+        ]
+        
+        if let orderBy = sortOption.orderByParameter {
+            queryItems.append(URLQueryItem(name: "orderBy", value: orderBy))
+            queryItems.append(URLQueryItem(name: "orderDirection", value: "desc")) // We usually want highest first
+        }
+        
+        urlComponents.queryItems = queryItems
+        
+        guard let url = urlComponents.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
+            throw NetworkError.invalidResponse
+        }
+        
+        let decodedResponse = try JSONDecoder().decode(CoinListResponse.self, from: data)
+        return decodedResponse
     }
+    
+    /// Fetches detailed information for a specific coin by UUID
+    func fetchCoinDetails(uuid: String, referenceCurrencyUuid: String = "yhjMzLPhuIDl", timePeriod: String = "24h") async throws -> CoinDetailsResponse {
+        var urlComponents = URLComponents(string: "\(baseURL)/coin/\(uuid)")!
+        
+        urlComponents.queryItems = [
+            URLQueryItem(name: "referenceCurrencyUuid", value: referenceCurrencyUuid),
+            URLQueryItem(name: "timePeriod", value: timePeriod)
+        ]
+        
+        guard let url = urlComponents.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
+            throw NetworkError.invalidResponse
+        }
+        
+        let decodedResponse = try JSONDecoder().decode(CoinDetailsResponse.self, from: data)
+        return decodedResponse
+    }
+}
+
+/// Defines how the coin list can be sorted
+enum CoinListSortOption {
+    case none
+    case highestPrice
+    case best24hPerformance
+    
+    var orderByParameter: String? {
+        switch self {
+        case .none:
+            return nil
+        case .highestPrice:
+            return "price"
+        case .best24hPerformance:
+            return "change"
+        }
+    }
+}
+
+/// Defines possible networking errors
+enum NetworkError: Error {
+    case invalidURL
+    case invalidResponse
 }

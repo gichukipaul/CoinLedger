@@ -10,11 +10,11 @@ import Foundation
 // MARK: - CoinListResponse
 struct CoinListResponse: Codable {
     let status: String
-    let data: DataClass
+    let data: CoinListDataClass
 }
 
-// MARK: - DataClass
-struct DataClass: Codable {
+// MARK: - CoinListDataClassDataClass
+struct CoinListDataClass: Codable {
     let stats: Stats
     let coins: [Coin]
 }
