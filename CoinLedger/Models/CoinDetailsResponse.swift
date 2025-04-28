@@ -39,7 +39,7 @@ struct CoinDetails: Codable {
     let lowVolume: Bool
     let listedAt: Int
     let hasContent: Bool
-
+    
     enum CodingKeys: String, CodingKey {
         case uuid, symbol, name, description, color
         case iconURL = "iconUrl"

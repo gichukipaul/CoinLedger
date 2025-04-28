@@ -12,7 +12,8 @@ import Foundation
 
 struct CoinService {
     private let baseURL = "https://api.coinranking.com/v2"
-
+    private let networkManager = NetworkManager()
+    
     /// Fetches a list of coins with optional sorting and pagination
     func fetchCoins(limit: Int, offset: Int, sortOption: CoinListSortOption = .none) async throws -> CoinListResponse {
         var urlComponents = URLComponents(string: "\(baseURL)/coins")!
@@ -24,7 +25,7 @@ struct CoinService {
         
         if let orderBy = sortOption.orderByParameter {
             queryItems.append(URLQueryItem(name: "orderBy", value: orderBy))
-            queryItems.append(URLQueryItem(name: "orderDirection", value: "desc")) // We usually want highest first
+            queryItems.append(URLQueryItem(name: "orderDirection", value: "desc")) // Default: highest first
         }
         
         urlComponents.queryItems = queryItems
@@ -33,14 +34,8 @@ struct CoinService {
             throw NetworkError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
-        
-        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
-            throw NetworkError.invalidResponse
-        }
-        
-        let decodedResponse = try JSONDecoder().decode(CoinListResponse.self, from: data)
-        return decodedResponse
+        let response: CoinListResponse = try await networkManager.fetchData(from: url)
+        return response
     }
     
     /// Fetches detailed information for a specific coin by UUID
@@ -56,14 +51,8 @@ struct CoinService {
             throw NetworkError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
-        
-        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
-            throw NetworkError.invalidResponse
-        }
-        
-        let decodedResponse = try JSONDecoder().decode(CoinDetailsResponse.self, from: data)
-        return decodedResponse
+        let response: CoinDetailsResponse = try await networkManager.fetchData(from: url)
+        return response
     }
 }
 

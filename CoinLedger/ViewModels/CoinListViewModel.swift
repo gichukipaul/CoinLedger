@@ -33,7 +33,7 @@ final class CoinListViewModel: ObservableObject {
     }
     
     // MARK: - Public Methods
-
+    
     /// Refreshes the list by resetting pagination and fetching from scratch
     func refreshCoins(sortOption: CoinListSortOption? = nil) async {
         isLoading = true
@@ -69,7 +69,7 @@ final class CoinListViewModel: ObservableObject {
     }
     
     // MARK: - Private Methods
-
+    
     /// Fetches the next page of coins
     private func loadMoreCoins() async {
         isLoading = true

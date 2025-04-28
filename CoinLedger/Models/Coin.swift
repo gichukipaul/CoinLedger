@@ -20,7 +20,7 @@ struct Coin: Codable {
     let coinrankingURL: String
     let the24HVolume, btcPrice: String
     let contractAddresses: [String]
-
+    
     enum CodingKeys: String, CodingKey {
         case uuid, symbol, name, color
         case iconURL = "iconUrl"
