@@ -16,3 +16,14 @@ extension Bundle {
         return key
     }
 }
+
+extension String {
+    func formatAsCurrency() -> String {
+        guard let value = Double(self) else { return self }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: NSNumber(value: value)) ?? self
+    }
+}

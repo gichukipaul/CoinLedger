@@ -8,10 +8,6 @@
 import Foundation
 // MARK: - CoinListViewModel
 /// The ViewModel responsible for handling the logic for displaying the list of coins.
-
-import Foundation
-
-/// ViewModel for managing the list of coins, including fetching, sorting, and pagination
 @MainActor
 final class CoinListViewModel: ObservableObject {
     
@@ -22,6 +18,7 @@ final class CoinListViewModel: ObservableObject {
     @Published var hasMoreCoins: Bool = true
     
     // MARK: - Private Properties
+    private(set) var isFetchingMore = false
     private let coinService: CoinService
     private var currentOffset: Int = 0
     private let pageSize: Int = 20
@@ -62,7 +59,8 @@ final class CoinListViewModel: ObservableObject {
     func loadMoreCoinsIfNeeded(currentItem: Coin) async {
         guard !isLoading, hasMoreCoins else { return }
         
-        let thresholdIndex = coins.index(coins.endIndex, offsetBy: -5)
+        // Check if we're close to the end of the list
+        let thresholdIndex = coins.count - 5
         if coins.firstIndex(where: { $0.uuid == currentItem.uuid }) == thresholdIndex {
             await loadMoreCoins()
         }
@@ -71,6 +69,7 @@ final class CoinListViewModel: ObservableObject {
     // MARK: - Private Methods
     
     /// Fetches the next page of coins
+    @MainActor
     private func loadMoreCoins() async {
         isLoading = true
         errorMessage = nil
