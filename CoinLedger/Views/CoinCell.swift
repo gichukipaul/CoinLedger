@@ -59,11 +59,11 @@ final class CoinCell: UITableViewCell {
         setupLayout()
         backgroundColor = .systemBackground
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     // MARK: - Layout
     private func setupLayout() {
         contentView.addSubview(iconImageView)
@@ -77,7 +77,7 @@ final class CoinCell: UITableViewCell {
             iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             iconImageView.heightAnchor.constraint(equalToConstant: 40),
             iconImageView.widthAnchor.constraint(equalToConstant: 40),
-
+            
             verticalStack.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 12),
             verticalStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             verticalStack.trailingAnchor.constraint(lessThanOrEqualTo: changeLabel.leadingAnchor, constant: -8),
@@ -87,7 +87,7 @@ final class CoinCell: UITableViewCell {
             changeLabel.widthAnchor.constraint(equalToConstant: 80)
         ])
     }
-
+    
     
     // MARK: - Configure
     func configure(with coin: Coin) {
@@ -103,7 +103,7 @@ final class CoinCell: UITableViewCell {
             changeLabel.text = "-"
             changeLabel.textColor = .secondaryLabel
         }
-
+        
         // Download icon
         iconImageView.image = nil
         let pngURLString = iconURLToPNG(from: coin.iconURL)

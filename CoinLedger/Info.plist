@@ -3,7 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>coinAPIKey</key>
-	<string>REPLACE THIS WITH YOUR KEY
-</string>
+	<string>REPLACE THIS WITH YOUR KEY</string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
 </dict>
 </plist>

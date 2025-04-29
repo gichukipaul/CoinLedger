@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 // MARK: - CoinListViewModel
 /// The ViewModel responsible for handling the logic for displaying the list of coins.
 @MainActor
@@ -47,9 +48,9 @@ final class CoinListViewModel: ObservableObject {
             let response = try await coinService.fetchCoins(limit: pageSize, offset: currentOffset, sortOption: self.sortOption)
             coins = response.data.coins
             currentOffset = coins.count
-            hasMoreCoins = coins.count == pageSize
+            hasMoreCoins = coins.count == pageSize && currentOffset < 100
         } catch {
-            errorMessage = "Failed to load coins: \(error.localizedDescription)"
+            self.errorMessage = ViewModelError.networkError.localizedDescription
         }
         
         isLoading = false
@@ -60,29 +61,50 @@ final class CoinListViewModel: ObservableObject {
         guard !isLoading, hasMoreCoins else { return }
         
         // Check if we're close to the end of the list
-        let thresholdIndex = coins.count - 5
-        if coins.firstIndex(where: { $0.uuid == currentItem.uuid }) == thresholdIndex {
+        let index = coins.firstIndex(where: { $0.uuid == currentItem.uuid }) ?? 0
+        if index >= coins.count - 2 {
             await loadMoreCoins()
         }
     }
     
     // MARK: - Private Methods
     
-    /// Fetches the next page of coins
-    @MainActor
+    /// Fetches the next page of coins with additional guard logic to prevent rapid calls
     private func loadMoreCoins() async {
+        guard !isFetchingMore, hasMoreCoins, currentOffset < 80, coins.count < 80 else { return }
+        
+        isFetchingMore = true
         isLoading = true
         errorMessage = nil
         
         do {
             let response = try await coinService.fetchCoins(limit: pageSize, offset: currentOffset, sortOption: sortOption)
+            
             coins.append(contentsOf: response.data.coins)
             currentOffset = coins.count
-            hasMoreCoins = response.data.coins.count == pageSize
+            
+            // Update hasMoreCoins based on both response and offset limit
+            hasMoreCoins = response.data.coins.count == pageSize && currentOffset < 80
         } catch {
             errorMessage = "Failed to load more coins: \(error.localizedDescription)"
         }
         
         isLoading = false
+        isFetchingMore = false
+    }
+    
+}
+
+// MARK: - Error Handling
+
+enum ViewModelError: LocalizedError {
+    case networkError
+    case noData
+    
+    var errorDescription: String? {
+        switch self {
+        case .networkError: return "Network error occurred. Please try again."
+        case .noData: return "No coins available."
+        }
     }
 }

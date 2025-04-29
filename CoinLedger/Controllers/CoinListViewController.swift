@@ -45,7 +45,7 @@ final class CoinListViewController: UIViewController {
         tableView.register(CoinCell.self, forCellReuseIdentifier: CoinCell.identifier)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.rowHeight = 80
+        tableView.rowHeight = 60
         tableView.estimatedRowHeight = 200
         tableView.tableFooterView = UIView()
         
@@ -67,16 +67,78 @@ final class CoinListViewController: UIViewController {
         ])
     }
     
+    private func createFooterView() -> UIView {
+        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 60))
+        footerView.backgroundColor = .clear
+        
+        let label = UILabel()
+        label.text = "You've reached the end of the free coin list."
+        label.textColor = .secondaryLabel
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        footerView.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -16),
+            label.centerYAnchor.constraint(equalTo: footerView.centerYAnchor)
+        ])
+        
+        return footerView
+    }
+    
+    private func createLoadingFooter() -> UIView {
+        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 60))
+        footerView.backgroundColor = .clear
+        
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.startAnimating()
+        
+        footerView.addSubview(spinner)
+        NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: footerView.centerYAnchor)
+        ])
+        
+        return footerView
+    }
+    
+    private func showFooterView() {
+        if viewModel.isLoading {
+            tableView.tableFooterView = createLoadingFooter()
+        } else if !viewModel.hasMoreCoins {
+            UIView.transition(with: tableView,
+                              duration: 0.25,
+                              options: .transitionCrossDissolve,
+                              animations: { [weak self] in
+                self?.tableView.tableFooterView = self?.createFooterView()
+            })
+        } else {
+            tableView.tableFooterView = nil
+        }
+    }
+    
+    
     private func fetchInitialCoins() {
         Task {
             await viewModel.refreshCoins()
-            updateUI()
+            await MainActor.run {
+                self.updateUI()
+                self.showFooterView()
+            }
         }
     }
     
     private func updateUI() {
         noDataLabel.isHidden = !viewModel.coins.isEmpty
         tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            self.showFooterView()
+        }
     }
     
     private func showAlert(message: String) {
@@ -89,7 +151,7 @@ final class CoinListViewController: UIViewController {
 // MARK: - UITableViewDataSource & UITableViewDelegate
 extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.coins.count + (viewModel.isLoading ? 1 : 0) // Add one more row for the spinner
+        return viewModel.coins.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -112,15 +174,21 @@ extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
+        let threshold = scrollView.frame.height * 1.5
         
-        // Trigger load more when scrolled to the bottom
-        if offsetY > contentHeight - scrollView.frame.height * 1.5 {
-            // Avoid multiple simultaneous fetch requests
-            if !viewModel.isLoading, let last = viewModel.coins.last {
-                Task {
-                    await viewModel.loadMoreCoinsIfNeeded(currentItem: last)
-                    tableView.reloadData()
-                }
+        // Trigger load more when approaching the bottom
+        guard offsetY > contentHeight - threshold,
+              !viewModel.isLoading,
+              !Task.isCancelled,
+              viewModel.hasMoreCoins,
+              let lastCoin = viewModel.coins.last else { return }
+        
+        // Use detached task to prevent retain cycles and main-thread blocking
+        Task.detached(priority: .userInitiated) { [self] in
+            await viewModel.loadMoreCoinsIfNeeded(currentItem: lastCoin)
+            await MainActor.run {
+                self.tableView.reloadData()
+                self.showFooterView()
             }
         }
     }
