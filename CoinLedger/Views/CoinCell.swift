@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class CoinCell: UITableViewCell {
     
@@ -26,6 +27,8 @@ final class CoinCell: UITableViewCell {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .body)
         label.textColor = .label
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
@@ -42,6 +45,12 @@ final class CoinCell: UITableViewCell {
         label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private let sparklineContainerView: UIView = {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        return container
     }()
     
     private let verticalStack: UIStackView = {
@@ -71,21 +80,28 @@ final class CoinCell: UITableViewCell {
         verticalStack.addArrangedSubview(nameLabel)
         verticalStack.addArrangedSubview(priceLabel)
         contentView.addSubview(verticalStack)
+        contentView.addSubview(sparklineContainerView)
         
         NSLayoutConstraint.activate([
             iconImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             iconImageView.heightAnchor.constraint(equalToConstant: 40),
             iconImageView.widthAnchor.constraint(equalToConstant: 40),
-            
+
             verticalStack.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 12),
             verticalStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            verticalStack.trailingAnchor.constraint(lessThanOrEqualTo: changeLabel.leadingAnchor, constant: -8),
-            
+            verticalStack.trailingAnchor.constraint(equalTo: sparklineContainerView.leadingAnchor, constant: -8),
+
+            sparklineContainerView.trailingAnchor.constraint(equalTo: changeLabel.leadingAnchor),
+            sparklineContainerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            sparklineContainerView.widthAnchor.constraint(equalToConstant: 100),
+            sparklineContainerView.heightAnchor.constraint(equalToConstant: 60),
+
             changeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             changeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             changeLabel.widthAnchor.constraint(equalToConstant: 80)
         ])
+
     }
     
     
@@ -111,6 +127,24 @@ final class CoinCell: UITableViewCell {
             DispatchQueue.main.async {
                 self?.iconImageView.image = image
             }
+        }
+        
+        // Sparkline Chart
+        let values = coin.sparkline.compactMap { Double($0 ?? "") }
+        if !values.isEmpty {
+            let isPositive = (Double(coin.change) ?? 0) >= 0
+            let hosting = UIHostingController(rootView: SparklineView(points: values, isPositive: isPositive))
+            hosting.view.translatesAutoresizingMaskIntoConstraints = false
+            
+            sparklineContainerView.subviews.forEach { $0.removeFromSuperview() }
+            sparklineContainerView.addSubview(hosting.view)
+            
+            NSLayoutConstraint.activate([
+                hosting.view.topAnchor.constraint(equalTo: sparklineContainerView.topAnchor),
+                hosting.view.bottomAnchor.constraint(equalTo: sparklineContainerView.bottomAnchor),
+                hosting.view.leadingAnchor.constraint(equalTo: sparklineContainerView.leadingAnchor),
+                hosting.view.trailingAnchor.constraint(equalTo: sparklineContainerView.trailingAnchor),
+            ])
         }
     }
 }

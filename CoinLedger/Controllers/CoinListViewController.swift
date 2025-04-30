@@ -46,7 +46,7 @@ final class CoinListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = 60
-        tableView.estimatedRowHeight = 200
+        tableView.estimatedRowHeight = 80
         tableView.tableFooterView = UIView()
         
         view.addSubview(tableView)
@@ -193,10 +193,10 @@ extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let coin = viewModel.coins[indexPath.row]
         let isFavourited = FavouriteCoinStorage.shared.isCoinFavourited(uuid: coin.uuid)
-
+        
         let action = UIContextualAction(style: .normal, title: isFavourited ? "UnFavourite" : "Favourite") { [weak self] _, _, completion in
             if isFavourited {
                 FavouriteCoinStorage.shared.remove(coin)
@@ -209,5 +209,5 @@ extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
         action.backgroundColor = isFavourited ? .systemRed : .systemGreen
         return UISwipeActionsConfiguration(actions: [action])
     }
-
+    
 }

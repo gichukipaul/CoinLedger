@@ -20,6 +20,16 @@ final class FavouriteCoinStorage {
         Favourite.symbol = coin.symbol
         Favourite.iconURL = coin.iconURL
         Favourite.price = coin.price
+        Favourite.change = coin.change
+        Favourite.color = coin.color
+        Favourite.marketCap = coin.marketCap
+        Favourite.listedAt = Int64(coin.listedAt)
+        Favourite.tier = Int64(coin.tier)
+        Favourite.rank = Int64(coin.rank)
+        Favourite.lowVolume = coin.lowVolume
+        Favourite.coinrankingURL = coin.coinrankingURL
+        Favourite.the24HVolume = coin.the24HVolume
+        Favourite.btcPrice = coin.btcPrice
         CoreDataManager.shared.saveContext()
     }
 

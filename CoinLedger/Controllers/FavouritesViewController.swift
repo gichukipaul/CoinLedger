@@ -7,65 +7,71 @@
 
 import UIKit
 
-final class FavouritesViewController: UITableViewController {
-
-    private var Favourites: [FavouriteCoin] = []
-
+final class FavouritesViewController: UIViewController {
+    
+    private let viewModel = FavouritesViewModel()
+    private let tableView = UITableView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Favourite Coins"
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "FavouriteCoinCell")
-        tableView.tableFooterView = UIView()
+        setupTableView()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadFavourites()
-    }
-
-    private func loadFavourites() {
-        Favourites = FavouriteCoinStorage.shared.fetchFavourites()
+        viewModel.loadFavourites()
         tableView.reloadData()
     }
+    
+    private func setupTableView() {
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        
+        tableView.register(CoinCell.self, forCellReuseIdentifier: CoinCell.identifier)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.rowHeight = 60
+        tableView.tableFooterView = UIView()
+    }
+}
 
-    // MARK: - TableView Data Source
-
-    override func numberOfSections(in tableView: UITableView) -> Int { 1 }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if Favourites.isEmpty {
+// MARK: - UITableViewDataSource & UITableViewDelegate
+extension FavouritesViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int { 1 }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if viewModel.favouriteCoins.isEmpty {
             tableView.setEmptyMessage("No coins Favourited.")
         } else {
             tableView.restore()
         }
-        return Favourites.count
+        return viewModel.favouriteCoins.count
     }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let coin = Favourites[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "FavouriteCoinCell", for: indexPath)
-        var content = cell.defaultContentConfiguration()
-        content.text = "\(coin.name ?? "") (\(coin.symbol ?? ""))"
-        content.secondaryText = "Price: \(coin.price ?? "-")"
-        cell.contentConfiguration = content
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CoinCell.identifier, for: indexPath) as? CoinCell else {
+            return UITableViewCell()
+        }
+        let coin = viewModel.favouriteCoins[indexPath.row]
+        cell.configure(with: coin)
         return cell
     }
-
-    // Optional: support swipe-to-remove from Favourites in the Favourites screen
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let coin = Favourites[indexPath.row]
-
-        let action = UIContextualAction(style: .destructive, title: "UnFavourite") { [weak self] _, _, completion in
-            guard let self else { return }
-            if let uuid = coin.uuid {
-                FavouriteCoinStorage.shared.removeByUUID(uuid)
-                self.Favourites.remove(at: indexPath.row)
-                self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            }
-            completion(true)
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let unfavouriteAction = UIContextualAction(style: .destructive, title: "Unfavourite") { [weak self] _, _, completionHandler in
+            guard let self = self else { return }
+            self.viewModel.removeFavourite(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            completionHandler(true)
         }
-
-        return UISwipeActionsConfiguration(actions: [action])
+        return UISwipeActionsConfiguration(actions: [unfavouriteAction])
     }
 }
-

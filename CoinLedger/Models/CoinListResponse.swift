@@ -19,7 +19,6 @@ struct CoinListDataClass: Codable {
     let coins: [Coin]
 }
 
-
 // MARK: - Stats
 struct Stats: Codable {
     let total, totalCoins, totalMarkets, totalExchanges: Int

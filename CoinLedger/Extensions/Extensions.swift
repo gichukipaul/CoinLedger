@@ -38,9 +38,33 @@ extension UITableView {
         backgroundView = label
         separatorStyle = .none
     }
-
+    
     func restore() {
         backgroundView = nil
         separatorStyle = .singleLine
+    }
+}
+
+extension FavouriteCoin {
+    var asCoin: Coin {
+        Coin(
+            uuid: uuid ?? "",
+            symbol: symbol ?? "",
+            name: name ?? "",
+            color: color ?? "",
+            iconURL: iconURL ?? "",
+            marketCap: marketCap ?? "",
+            price: price ?? "",
+            listedAt: Int(listedAt),
+            tier: Int(tier),
+            change: change ?? "",
+            rank: Int(rank),
+            sparkline: [], // Not persisted in Core Data for now
+            lowVolume: lowVolume,
+            coinrankingURL: coinrankingURL ?? "",
+            the24HVolume: the24HVolume ?? "",
+            btcPrice: btcPrice ?? "",
+            contractAddresses: [] // Not persisted in Core Data for now
+        )
     }
 }
