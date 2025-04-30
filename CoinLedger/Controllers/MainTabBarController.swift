@@ -21,11 +21,11 @@ final class MainTabBarController: UITabBarController {
         let coinListNav = UINavigationController(rootViewController: coinListVC)
         coinListNav.tabBarItem = UITabBarItem(title: "Coins", image: UIImage(systemName: "bitcoinsign.circle"), tag: 0)
 
-        let favoritesVC = FavoritesViewController()
-        let favoritesNav = UINavigationController(rootViewController: favoritesVC)
-        favoritesNav.tabBarItem = UITabBarItem(title: "Favorites", image: UIImage(systemName: "star"), tag: 1)
+        let FavouritesVC = FavouritesViewController()
+        let FavouritesNav = UINavigationController(rootViewController: FavouritesVC)
+        FavouritesNav.tabBarItem = UITabBarItem(title: "Favourites", image: UIImage(systemName: "star"), tag: 1)
 
-        viewControllers = [coinListNav, favoritesNav]
+        viewControllers = [coinListNav, FavouritesNav]
     }
 }
 

@@ -192,4 +192,22 @@ extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
             }
         }
     }
+    
+     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let coin = viewModel.coins[indexPath.row]
+        let isFavourited = FavouriteCoinStorage.shared.isCoinFavourited(uuid: coin.uuid)
+
+        let action = UIContextualAction(style: .normal, title: isFavourited ? "UnFavourite" : "Favourite") { [weak self] _, _, completion in
+            if isFavourited {
+                FavouriteCoinStorage.shared.remove(coin)
+            } else {
+                FavouriteCoinStorage.shared.save(coin)
+            }
+            completion(true)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+        action.backgroundColor = isFavourited ? .systemRed : .systemGreen
+        return UISwipeActionsConfiguration(actions: [action])
+    }
+
 }
