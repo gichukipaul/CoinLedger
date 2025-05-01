@@ -30,7 +30,7 @@ final class CoinListViewModel: ObservableObject {
         self.coinService = coinService
     }
     
-    // MARK: - Public Methods
+    // MARK: - Coin Fetching Methods
     
     /// Refreshes the list by resetting pagination and fetching from scratch
     func refreshCoins(sortOption: CoinListSortOption? = nil) async {
@@ -44,12 +44,20 @@ final class CoinListViewModel: ObservableObject {
         currentOffset = 0
         hasMoreCoins = true
         
+        // Check for internet connectivity
+        if !NetworkMonitor.shared.isConnected {
+            errorMessage = "No internet connection. Please check your connection and try again."
+            isLoading = false
+            return
+        }
+        
         do {
             let response = try await coinService.fetchCoins(limit: pageSize, offset: currentOffset, sortOption: self.sortOption)
             coins = response.data.coins
             currentOffset = coins.count
             hasMoreCoins = coins.count == pageSize && currentOffset < 100
         } catch {
+            // Handle network errors here (e.g., invalid URL or server issues)
             self.errorMessage = ViewModelError.networkError.localizedDescription
         }
         

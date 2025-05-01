@@ -87,21 +87,21 @@ final class CoinCell: UITableViewCell {
             iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             iconImageView.heightAnchor.constraint(equalToConstant: 40),
             iconImageView.widthAnchor.constraint(equalToConstant: 40),
-
+            
             verticalStack.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 12),
             verticalStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             verticalStack.trailingAnchor.constraint(equalTo: sparklineContainerView.leadingAnchor, constant: -8),
-
+            
             sparklineContainerView.trailingAnchor.constraint(equalTo: changeLabel.leadingAnchor),
             sparklineContainerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             sparklineContainerView.widthAnchor.constraint(equalToConstant: 100),
             sparklineContainerView.heightAnchor.constraint(equalToConstant: 60),
-
+            
             changeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             changeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             changeLabel.widthAnchor.constraint(equalToConstant: 80)
         ])
-
+        
     }
     
     

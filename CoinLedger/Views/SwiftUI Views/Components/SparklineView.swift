@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Charts
 
 struct SparklineView: View {
     var points: [Double]

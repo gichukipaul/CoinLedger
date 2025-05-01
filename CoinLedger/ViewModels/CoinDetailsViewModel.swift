@@ -29,7 +29,8 @@ final class CoinDetailsViewModel: ObservableObject {
             let response = try await coinService.fetchCoinDetails(uuid: uuid)
             self.coinDetails = response.data.coin
         } catch {
-            errorMessage = "Failed to load details: \(error.localizedDescription)"
+            errorMessage = "Failed to load details: \(error)"
+            print("Error fetching details for \(uuid): \(error)")
         }
         
         isLoading = false

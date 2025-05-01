@@ -51,6 +51,7 @@ struct CoinService {
             throw NetworkError.invalidURL
         }
         
+        print("\(url)")
         let response: CoinDetailsResponse = try await networkManager.fetchData(from: url)
         return response
     }
@@ -78,4 +79,17 @@ enum CoinListSortOption {
 enum NetworkError: Error {
     case invalidURL
     case invalidResponse
+    case noInternet
+    
+    var errorDescription: String? {
+        switch self {
+            
+        case .invalidURL:
+            return "Network error occurred due to invalid endpoint. Please try again."
+        case .invalidResponse:
+            return "Server error occurred. Please try again."
+        case .noInternet:
+            return "Seems you are offline. Please check your internet connection"
+        }
+    }
 }

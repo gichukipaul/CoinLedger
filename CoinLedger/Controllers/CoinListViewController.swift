@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class CoinListViewController: UIViewController {
     
     // MARK: - UI Elements
     private let tableView = UITableView()
     private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private let loadingView = LoadingStateView()
     
     private lazy var noDataLabel: UILabel = {
         let label = UILabel()
@@ -41,6 +43,8 @@ final class CoinListViewController: UIViewController {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         noDataLabel.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        
         
         tableView.register(CoinCell.self, forCellReuseIdentifier: CoinCell.identifier)
         tableView.delegate = self
@@ -52,6 +56,7 @@ final class CoinListViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
         view.addSubview(noDataLabel)
+        view.addSubview(loadingView)
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -61,6 +66,11 @@ final class CoinListViewController: UIViewController {
             
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
             noDataLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             noDataLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
@@ -123,11 +133,25 @@ final class CoinListViewController: UIViewController {
     
     
     private func fetchInitialCoins() {
+        loadingView.setState(.loading)
+        tableView.isUserInteractionEnabled = false
+        
         Task {
             await viewModel.refreshCoins()
             await MainActor.run {
-                self.updateUI()
-                self.showFooterView()
+                tableView.isUserInteractionEnabled = true
+                tableView.reloadData()
+                showFooterView()
+                
+                if let error = viewModel.errorMessage, viewModel.coins.isEmpty {
+                    loadingView.setState(.error(message: error) { [weak self] in
+                        self?.fetchInitialCoins()
+                    })
+                } else if viewModel.coins.isEmpty {
+                    loadingView.setState(.empty(message: "No coins available"))
+                } else {
+                    loadingView.setState(.hidden)
+                }
             }
         }
     }
@@ -146,10 +170,30 @@ final class CoinListViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel))
         present(alert, animated: true)
     }
+    
+    private func addRetryButton() {
+        let retryButton = UIButton(type: .system)
+        retryButton.setTitle("Retry", for: .normal)
+        retryButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .headline)
+        retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
+        
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(retryButton)
+        
+        NSLayoutConstraint.activate([
+            retryButton.topAnchor.constraint(equalTo: noDataLabel.bottomAnchor, constant: 16),
+            retryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    @objc private func retryTapped() {
+        fetchInitialCoins()
+    }
 }
 
 // MARK: - UITableViewDataSource & UITableViewDelegate
 extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.coins.count
     }
@@ -169,6 +213,17 @@ extension CoinListViewController: UITableViewDataSource, UITableViewDelegate {
         }
         cell.configure(with: viewModel.coins[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedCoin = viewModel.coins[indexPath.row]
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let viewModel = CoinDetailsViewModel(uuid: selectedCoin.uuid)
+        let swiftUIView = CoinDetailsView(viewModel: viewModel)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

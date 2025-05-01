@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class FavouritesViewController: UIViewController {
     
     private let viewModel = FavouritesViewModel()
     private let tableView = UITableView()
+    private let loadingView = LoadingStateView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,18 +22,38 @@ final class FavouritesViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.loadFavourites()
-        tableView.reloadData()
+        
+        loadingView.setState(.loading)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.viewModel.loadFavourites()
+            self.tableView.reloadData()
+            
+            if self.viewModel.favouriteCoins.isEmpty {
+                self.loadingView.setState(.empty(message: "No coins favourited."))
+            } else {
+                self.loadingView.setState(.hidden)
+            }
+        }
     }
     
     private func setupTableView() {
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(loadingView)
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         
         tableView.register(CoinCell.self, forCellReuseIdentifier: CoinCell.identifier)
@@ -48,11 +70,6 @@ extension FavouritesViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int { 1 }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if viewModel.favouriteCoins.isEmpty {
-            tableView.setEmptyMessage("No coins Favourited.")
-        } else {
-            tableView.restore()
-        }
         return viewModel.favouriteCoins.count
     }
     
@@ -63,6 +80,17 @@ extension FavouritesViewController: UITableViewDataSource, UITableViewDelegate {
         let coin = viewModel.favouriteCoins[indexPath.row]
         cell.configure(with: coin)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedCoin = viewModel.favouriteCoins[indexPath.row]
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let viewModel = CoinDetailsViewModel(uuid: selectedCoin.uuid)
+        let swiftUIView = CoinDetailsView(viewModel: viewModel)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

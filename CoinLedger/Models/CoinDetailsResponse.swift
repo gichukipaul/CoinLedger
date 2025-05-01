@@ -20,14 +20,16 @@ struct CoinDetailsDataClass: Codable {
 
 // MARK: - Coin
 struct CoinDetails: Codable {
-    let uuid, symbol, name, description: String
+    let uuid, symbol, name: String
     let color: String
+    let description: String?
     let iconURL: String
+    let marketCap: String?
     let websiteURL: String
-    let links: [Link]
-    let supply: Supply
+    let links: [CoinLink]
+    let supply: Supply?
     let numberOfMarkets, numberOfExchanges: Int
-    let the24HVolume, marketCap, fullyDilutedMarketCap, price: String
+    let the24HVolume, fullyDilutedMarketCap, price: String
     let btcPrice: String
     let priceAt: Int
     let change: String
@@ -59,7 +61,7 @@ struct AllTimeHigh: Codable {
 }
 
 // MARK: - Link
-struct Link: Codable {
+struct CoinLink: Codable {
     let name: String
     let url: String
     let type: String
@@ -69,5 +71,6 @@ struct Link: Codable {
 struct Supply: Codable {
     let confirmed: Bool
     let supplyAt: Int
-    let max, total, circulating: String
+    let max, total: String?
+    let circulating: String?
 }
