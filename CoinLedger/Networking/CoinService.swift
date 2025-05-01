@@ -33,7 +33,7 @@ struct CoinService {
         guard let url = urlComponents.url else {
             throw NetworkError.invalidURL
         }
-        
+        print(url)
         let response: CoinListResponse = try await networkManager.fetchData(from: url)
         return response
     }
@@ -51,7 +51,6 @@ struct CoinService {
             throw NetworkError.invalidURL
         }
         
-        print("\(url)")
         let response: CoinDetailsResponse = try await networkManager.fetchData(from: url)
         return response
     }

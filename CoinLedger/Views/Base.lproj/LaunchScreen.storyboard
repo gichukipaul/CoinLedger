@@ -15,16 +15,42 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launchImage" translatesAutoresizingMaskIntoConstraints="NO" id="Znv-4n-nxF">
+                                <rect key="frame" x="76.666666666666686" y="306" width="240" height="240"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="240" id="jM5-ll-MJD"/>
+                                    <constraint firstAttribute="width" constant="240" id="k1J-aJ-qqO"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Coin Ledger" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="04S-kH-eDM">
+                                <rect key="frame" x="0.0" y="571" width="393" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="70" id="QtG-an-O9c"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HiraginoSans-W5" family="Hiragino Sans" pointSize="31"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="04S-kH-eDM" secondAttribute="trailing" id="216-0j-wHL"/>
+                            <constraint firstItem="Znv-4n-nxF" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="7dB-R3-x1A"/>
+                            <constraint firstItem="04S-kH-eDM" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="7zq-0s-pf9"/>
+                            <constraint firstItem="Znv-4n-nxF" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="JrF-Vi-5un"/>
+                            <constraint firstItem="04S-kH-eDM" firstAttribute="top" secondItem="Znv-4n-nxF" secondAttribute="bottom" constant="25" id="eoj-T9-xpp"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="80" y="192"/>
+            <point key="canvasLocation" x="78.625954198473281" y="191.5492957746479"/>
         </scene>
     </scenes>
     <resources>
+        <image name="launchImage" width="341.33334350585938" height="341.33334350585938"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -21,12 +21,12 @@ final class CoinDetailsViewModel: ObservableObject {
         self.coinService = coinService
     }
     
-    func fetchDetails() async {
+    func fetchDetails(timePeriod: String = "24h") async {
         isLoading = true
         errorMessage = nil
         
         do {
-            let response = try await coinService.fetchCoinDetails(uuid: uuid)
+            let response = try await coinService.fetchCoinDetails(uuid: uuid, timePeriod: timePeriod)
             self.coinDetails = response.data.coin
         } catch {
             errorMessage = "Failed to load details: \(error)"

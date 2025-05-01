@@ -17,13 +17,13 @@ final class CoinListViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var hasMoreCoins: Bool = true
+    @Published var sortOption: CoinListSortOption = .none
     
     // MARK: - Private Properties
     private(set) var isFetchingMore = false
     private let coinService: CoinService
     private var currentOffset: Int = 0
     private let pageSize: Int = 20
-    private var sortOption: CoinListSortOption = .none
     
     // MARK: - Initialization
     init(coinService: CoinService = CoinService()) {
@@ -31,7 +31,6 @@ final class CoinListViewModel: ObservableObject {
     }
     
     // MARK: - Coin Fetching Methods
-    
     /// Refreshes the list by resetting pagination and fetching from scratch
     func refreshCoins(sortOption: CoinListSortOption? = nil) async {
         isLoading = true
@@ -57,18 +56,20 @@ final class CoinListViewModel: ObservableObject {
             currentOffset = coins.count
             hasMoreCoins = coins.count == pageSize && currentOffset < 100
         } catch {
-            // Handle network errors here (e.g., invalid URL or server issues)
-            self.errorMessage = ViewModelError.networkError.localizedDescription
+            errorMessage = ViewModelError.networkError.localizedDescription
         }
         
         isLoading = false
     }
     
-    /// Loads more coins for pagination when user scrolls to bottom
+    func setSortOption(_ newSortOption: CoinListSortOption) async {
+        guard sortOption != newSortOption else { return }
+        sortOption = newSortOption
+        await refreshCoins(sortOption: sortOption)
+    }
+    
     func loadMoreCoinsIfNeeded(currentItem: Coin) async {
         guard !isLoading, hasMoreCoins else { return }
-        
-        // Check if we're close to the end of the list
         let index = coins.firstIndex(where: { $0.uuid == currentItem.uuid }) ?? 0
         if index >= coins.count - 2 {
             await loadMoreCoins()
@@ -77,7 +78,6 @@ final class CoinListViewModel: ObservableObject {
     
     // MARK: - Private Methods
     
-    /// Fetches the next page of coins with additional guard logic to prevent rapid calls
     private func loadMoreCoins() async {
         guard !isFetchingMore, hasMoreCoins, currentOffset < 80, coins.count < 80 else { return }
         
@@ -87,11 +87,8 @@ final class CoinListViewModel: ObservableObject {
         
         do {
             let response = try await coinService.fetchCoins(limit: pageSize, offset: currentOffset, sortOption: sortOption)
-            
             coins.append(contentsOf: response.data.coins)
             currentOffset = coins.count
-            
-            // Update hasMoreCoins based on both response and offset limit
             hasMoreCoins = response.data.coins.count == pageSize && currentOffset < 80
         } catch {
             errorMessage = "Failed to load more coins: \(error.localizedDescription)"

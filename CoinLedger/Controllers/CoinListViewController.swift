@@ -25,6 +25,13 @@ final class CoinListViewController: UIViewController {
         return label
     }()
     
+    private let filterSegmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: ["None", "Highest Price", "Best 24h"])
+        control.selectedSegmentIndex = 0
+        control.translatesAutoresizingMaskIntoConstraints = false
+        return control
+    }()
+    
     // MARK: - ViewModel
     private let viewModel = CoinListViewModel()
     
@@ -45,6 +52,8 @@ final class CoinListViewController: UIViewController {
         noDataLabel.translatesAutoresizingMaskIntoConstraints = false
         loadingView.translatesAutoresizingMaskIntoConstraints = false
         
+        view.addSubview(filterSegmentedControl)
+        filterSegmentedControl.addTarget(self, action: #selector(filterChanged), for: .valueChanged)
         
         tableView.register(CoinCell.self, forCellReuseIdentifier: CoinCell.identifier)
         tableView.delegate = self
@@ -59,7 +68,12 @@ final class CoinListViewController: UIViewController {
         view.addSubview(loadingView)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            
+            filterSegmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            filterSegmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            filterSegmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            tableView.topAnchor.constraint(equalTo: filterSegmentedControl.bottomAnchor, constant: 8),
             tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -131,12 +145,44 @@ final class CoinListViewController: UIViewController {
         }
     }
     
+    @objc private func filterChanged() {
+        let selectedOption: CoinListSortOption
+        switch filterSegmentedControl.selectedSegmentIndex {
+        case 1:
+            selectedOption = .highestPrice
+        case 2:
+            selectedOption = .best24hPerformance
+        default:
+            selectedOption = .none
+        }
+        
+        Task {
+            loadingView.setState(.loading)
+            tableView.isUserInteractionEnabled = false
+            
+            await viewModel.setSortOption(selectedOption)
+            
+            await MainActor.run {
+                // Only update UI once data is ready
+                tableView.isUserInteractionEnabled = true
+                
+                UIView.performWithoutAnimation {
+                    tableView.reloadSections(IndexSet(integer: 0), with: .none)
+                }
+                
+                showFooterView()
+                loadingView.setState(.hidden)
+            }
+        }
+    }
+    
     
     private func fetchInitialCoins() {
         loadingView.setState(.loading)
         tableView.isUserInteractionEnabled = false
         
         Task {
+            await viewModel.setSortOption(CoinListSortOption.none)
             await viewModel.refreshCoins()
             await MainActor.run {
                 tableView.isUserInteractionEnabled = true

@@ -16,7 +16,7 @@ final class FavouritesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Favourite Coins"
+        title = NSLocalizedString("Favourite Coins", comment: "Title for the favourites screen")
         setupTableView()
     }
     
@@ -30,7 +30,7 @@ final class FavouritesViewController: UIViewController {
             self.tableView.reloadData()
             
             if self.viewModel.favouriteCoins.isEmpty {
-                self.loadingView.setState(.empty(message: "No coins favourited."))
+                self.loadingView.setState(.empty(message: NSLocalizedString("No coins favourited.", comment: "Message when no coins are favourited")))
             } else {
                 self.loadingView.setState(.hidden)
             }
@@ -43,6 +43,9 @@ final class FavouritesViewController: UIViewController {
         
         view.addSubview(loadingView)
         loadingView.translatesAutoresizingMaskIntoConstraints = false
+        
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .clear
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -94,7 +97,7 @@ extension FavouritesViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let unfavouriteAction = UIContextualAction(style: .destructive, title: "Unfavourite") { [weak self] _, _, completionHandler in
+        let unfavouriteAction = UIContextualAction(style: .destructive, title: NSLocalizedString("Unfavourite", comment: "Unfavourite button title")) { [weak self] _, _, completionHandler in
             guard let self = self else { return }
             self.viewModel.removeFavourite(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
