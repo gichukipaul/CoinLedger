@@ -1,24 +1,13 @@
 //
-//  CoinDetailsResponse.swift
+//  CoinDetails.swift
 //  CoinLedger
 //
-//  Created by GICHUKI on 29/04/2025.
+//  Created by GICHUKI on 02/05/2025.
 //
+
 
 import Foundation
 
-// MARK: - CoinDetailsResponse
-struct CoinDetailsResponse: Codable {
-    let status: String
-    let data: CoinDetailsDataClass
-}
-
-// MARK: - CoinDetailsDataClass
-struct CoinDetailsDataClass: Codable {
-    let coin: CoinDetails
-}
-
-// MARK: - Coin
 struct CoinDetails: Codable {
     let uuid, symbol, name: String
     let color: String?
@@ -52,25 +41,4 @@ struct CoinDetails: Codable {
         case coinrankingURL = "coinrankingUrl"
         case tier, lowVolume, listedAt, hasContent
     }
-}
-
-// MARK: - AllTimeHigh
-struct AllTimeHigh: Codable {
-    let price: String
-    let timestamp: Int
-}
-
-// MARK: - Link
-struct CoinLink: Codable {
-    let name: String
-    let url: String
-    let type: String
-}
-
-// MARK: - Supply
-struct Supply: Codable {
-    let confirmed: Bool
-    let supplyAt: Int
-    let max, total: String?
-    let circulating: String?
 }

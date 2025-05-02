@@ -33,7 +33,7 @@
 		DBAD3AAB2DBD775600063B2C /* Exceptions for "CoinLedger" folder in "CoinLedger" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				App/Info.plist,
 			);
 			target = DBAD3A7F2DBD775500063B2C /* CoinLedger */;
 		};
@@ -291,7 +291,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 242J9RYTYL;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CoinLedger/Info.plist;
+				INFOPLIST_FILE = CoinLedger/App/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -318,7 +318,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 242J9RYTYL;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CoinLedger/Info.plist;
+				INFOPLIST_FILE = CoinLedger/App/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
