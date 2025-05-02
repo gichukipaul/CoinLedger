@@ -36,8 +36,8 @@ struct CoinLink: Codable {
 
 // MARK: - Supply
 struct Supply: Codable {
-    let confirmed: Bool
-    let supplyAt: Int
+    let confirmed: Bool?
+    let supplyAt: Int?
     let max, total: String?
     let circulating: String?
 }
