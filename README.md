@@ -9,7 +9,6 @@ An iOS application that displays the top 100 cryptocurrencies from the [CoinRank
   <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/l3.png" alt="Light Mode Screenshot 3" width="220" />
 </div>
 <br>
-
 <div style="display:flex; justify-content:center;">
   <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/d1.png" alt="Dark Mode Screenshot 1" width="220" style="margin-right: 25px;"/>
 
