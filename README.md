@@ -87,7 +87,6 @@ An iOS application that displays the top 100 cryptocurrencies from the [CoinRank
   - API service layer (mocked responses)
 
 Run all tests via `Product > Test` or `Cmd + U`.
-
 ---
 
 ## 🎨 UI/UX Highlights
