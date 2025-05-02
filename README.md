@@ -64,15 +64,12 @@ An iOS application that displays the top 100 cryptocurrencies from the [CoinRank
    ```bash
    open CoinLedger.xcodeproj
    ```
-
-3. Build and run the app on a simulator or real device.
-
-4. Add your API key in `App/Info.plist`:
+3. Add your API key in `App/Info.plist`:
    ```xml
     <key>coinAPIKey</key>
     <string>REPLACE THIS WITH YOUR KEY</string>
    ```
-
+4. Build and run the app on a simulator or real device.
 ---
 
 ## 🧠 Assumptions & Design Decisions
@@ -80,6 +77,7 @@ An iOS application that displays the top 100 cryptocurrencies from the [CoinRank
 - Pagination is done **client-side**, as the full data is fetched at once for simplicity.
 - Coin details and favorites are persisted using **CoreData**.
 - Used **SwiftUI** for reusable components (like coin cells, buttons, chart view), and **UIKit** for navigation-heavy screens and complex table behaviors.
+- The app requires active internet connection, and incase the internet drops, there is a retry button.
 
 ---
 
