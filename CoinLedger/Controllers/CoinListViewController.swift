@@ -146,61 +146,48 @@ final class CoinListViewController: UIViewController {
     }
     
     @objc private func filterChanged() {
-        let selectedOption: CoinListSortOption
-        switch filterSegmentedControl.selectedSegmentIndex {
-        case 1:
-            selectedOption = .highestPrice
-        case 2:
-            selectedOption = .best24hPerformance
-        default:
-            selectedOption = .none
+            let selectedOption: CoinListSortOption
+            switch filterSegmentedControl.selectedSegmentIndex {
+            case 1:
+                selectedOption = .highestPrice
+            case 2:
+                selectedOption = .best24hPerformance
+            default:
+                selectedOption = .none
+            }
+            
+            Task {
+                await viewModel.setSortOption(selectedOption)
+                await MainActor.run {
+                    self.tableView.reloadData()
+                    self.showFooterView()
+                }
+            }
         }
         
-        Task {
+        private func fetchInitialCoins() {
             loadingView.setState(.loading)
             tableView.isUserInteractionEnabled = false
             
-            await viewModel.setSortOption(selectedOption)
-            
-            await MainActor.run {
-                // Only update UI once data is ready
-                tableView.isUserInteractionEnabled = true
-                
-                UIView.performWithoutAnimation {
-                    tableView.reloadSections(IndexSet(integer: 0), with: .none)
-                }
-                
-                showFooterView()
-                loadingView.setState(.hidden)
-            }
-        }
-    }
-    
-    
-    private func fetchInitialCoins() {
-        loadingView.setState(.loading)
-        tableView.isUserInteractionEnabled = false
-        
-        Task {
-            await viewModel.setSortOption(CoinListSortOption.none)
-            await viewModel.refreshCoins()
-            await MainActor.run {
-                tableView.isUserInteractionEnabled = true
-                tableView.reloadData()
-                showFooterView()
-                
-                if let error = viewModel.errorMessage, viewModel.coins.isEmpty {
-                    loadingView.setState(.error(message: error) { [weak self] in
-                        self?.fetchInitialCoins()
-                    })
-                } else if viewModel.coins.isEmpty {
-                    loadingView.setState(.empty(message: "No coins available"))
-                } else {
-                    loadingView.setState(.hidden)
+            Task {
+                await viewModel.refreshCoins()
+                await MainActor.run {
+                    tableView.isUserInteractionEnabled = true
+                    tableView.reloadData()
+                    showFooterView()
+                    
+                    if let error = viewModel.errorMessage, viewModel.coins.isEmpty {
+                        loadingView.setState(.error(message: error) { [weak self] in
+                            self?.fetchInitialCoins()
+                        })
+                    } else if viewModel.coins.isEmpty {
+                        loadingView.setState(.empty(message: "No coins available"))
+                    } else {
+                        loadingView.setState(.hidden)
+                    }
                 }
             }
         }
-    }
     
     private func updateUI() {
         noDataLabel.isHidden = !viewModel.coins.isEmpty

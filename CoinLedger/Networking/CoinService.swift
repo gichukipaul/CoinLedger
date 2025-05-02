@@ -11,8 +11,13 @@ import Foundation
 /// Handles all networking related to Coins
 
 struct CoinService {
-    private let baseURL = "https://api.coinranking.com/v2"
-    private let networkManager = NetworkManager()
+    private let baseURL: String
+    private let networkManager: NetworkManager
+
+    init(baseURL: String = "https://api.coinranking.com/v2", networkManager: NetworkManager = NetworkManager()) {
+        self.baseURL = baseURL
+        self.networkManager = networkManager
+    }
     
     /// Fetches a list of coins with optional sorting and pagination
     func fetchCoins(limit: Int, offset: Int, sortOption: CoinListSortOption = .none) async throws -> CoinListResponse {
@@ -33,7 +38,7 @@ struct CoinService {
         guard let url = urlComponents.url else {
             throw NetworkError.invalidURL
         }
-        print(url)
+        
         let response: CoinListResponse = try await networkManager.fetchData(from: url)
         return response
     }

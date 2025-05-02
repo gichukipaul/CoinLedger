@@ -25,7 +25,6 @@ final class CoinListViewModel: ObservableObject {
     private var currentOffset: Int = 0
     private let pageSize: Int = 20
     
-    // MARK: - Initialization
     init(coinService: CoinService = CoinService()) {
         self.coinService = coinService
     }
@@ -76,8 +75,6 @@ final class CoinListViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Private Methods
-    
     private func loadMoreCoins() async {
         guard !isFetchingMore, hasMoreCoins, currentOffset < 80, coins.count < 80 else { return }
         
@@ -96,20 +93,5 @@ final class CoinListViewModel: ObservableObject {
         
         isLoading = false
         isFetchingMore = false
-    }
-    
-}
-
-// MARK: - Error Handling
-
-enum ViewModelError: LocalizedError {
-    case networkError
-    case noData
-    
-    var errorDescription: String? {
-        switch self {
-        case .networkError: return "Network error occurred. Please try again."
-        case .noData: return "No coins available."
-        }
     }
 }

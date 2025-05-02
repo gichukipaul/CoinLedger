@@ -21,11 +21,11 @@ struct CoinDetailsDataClass: Codable {
 // MARK: - Coin
 struct CoinDetails: Codable {
     let uuid, symbol, name: String
-    let color: String
+    let color: String?
     let description: String?
     let iconURL: String
     let marketCap: String?
-    let websiteURL: String
+    let websiteURL: String?
     let links: [CoinLink]
     let supply: Supply?
     let numberOfMarkets, numberOfExchanges: Int

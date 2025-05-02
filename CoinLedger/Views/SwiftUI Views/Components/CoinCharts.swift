@@ -15,6 +15,7 @@ struct LineChartView: View {
     
     var body: some View {
         Chart {
+            // Line data
             ForEach(points.indices, id: \.self) { index in
                 LineMark(
                     x: .value("Index", index),
@@ -24,9 +25,20 @@ struct LineChartView: View {
                 .foregroundStyle(isPositiveChange ? .green : .red)
                 .opacity(animate ? 1 : 0.1)
             }
+            
+            // Baseline rule
+            if let baseline = points.first {
+                RuleMark(y: .value("Baseline", baseline))
+                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
+                    .foregroundStyle(.gray)
+                    .opacity(0.5)
+            }
         }
         .background(
-            LinearGradient(gradient: Gradient(colors: [isPositiveChange ? Color.green.opacity(0.1) : Color.red.opacity(0.1), Color.clear]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(
+                gradient: Gradient(colors: [isPositiveChange ? Color.green.opacity(0.1) : Color.red.opacity(0.1), Color.clear]),
+                startPoint: .top, endPoint: .bottom
+            )
         )
         .chartYScale(domain: .automatic(includesZero: false))
         .chartXScale(domain: 0...(points.count - 1))
@@ -100,6 +112,14 @@ struct AreaChartView: View {
                 .interpolationMethod(.catmullRom)
                 .foregroundStyle(isPositiveChange ? .green : .red)
                 .opacity(animate ? 0.8 : 0.2)
+            }
+            
+            // Baseline rule
+            if let baseline = volumes.first {
+                RuleMark(y: .value("Baseline", baseline))
+                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
+                    .foregroundStyle(.gray)
+                    .opacity(0.5)
             }
         }
         .chartYScale(domain: .automatic(includesZero: false))

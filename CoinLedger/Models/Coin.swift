@@ -9,7 +9,8 @@ import Foundation
 
 // MARK: - Coin
 struct Coin: Codable {
-    let uuid, symbol, name, color: String
+    let uuid, symbol, name: String
+    let color: String?
     let iconURL: String
     let marketCap, price: String
     let listedAt, tier: Int

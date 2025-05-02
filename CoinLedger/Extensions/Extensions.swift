@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 
+///Retrieve the API key stored in the Info.plist
 extension Bundle {
     var coinAPIKey: String? {
         guard let key = object(forInfoDictionaryKey: "coinAPIKey") as? String else {
@@ -46,6 +47,7 @@ extension UITableView {
     }
 }
 
+/// This is for persisting in CoreData
 extension FavouriteCoin {
     var asCoin: Coin {
         Coin(
@@ -71,28 +73,33 @@ extension FavouriteCoin {
 }
 
 extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "#", with: "")
-        let scanner = Scanner(string: hex)
+    init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        
         var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
-
-        let r, g, b, a: Double
-        switch hex.count {
-        case 6: // RGB (24-bit)
-            r = Double((rgb & 0xFF0000) >> 16) / 255
-            g = Double((rgb & 0x00FF00) >> 8) / 255
-            b = Double(rgb & 0x0000FF) / 255
-            a = 1.0
-        case 8: // RGBA (32-bit)
-            r = Double((rgb & 0xFF000000) >> 24) / 255
-            g = Double((rgb & 0x00FF0000) >> 16) / 255
-            b = Double((rgb & 0x0000FF00) >> 8) / 255
-            a = Double(rgb & 0x000000FF) / 255
-        default:
-            r = 0; g = 0; b = 0; a = 1.0
+        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else { return nil }
+        
+        let red = Double((rgb >> 16) & 0xFF) / 255
+        let green = Double((rgb >> 8) & 0xFF) / 255
+        let blue = Double(rgb & 0xFF) / 255
+        
+        self.init(red: red, green: green, blue: blue)
+    }
+    
+    ///Sometimes the coin color is not legible when in dark or light mode
+    ///In such a case, we reduce or increase the brightness accordingly. That way the content will be legible.
+    func isTooCloseToBackground(for scheme: ColorScheme) -> Bool {
+        let components = UIColor(self).cgColor.components ?? [0, 0, 0]
+        let brightness = (components[0] * 299 + components[1] * 587 + components[2] * 114) / 1000
+        
+        switch scheme {
+        case .light:
+            return brightness > 0.8
+        case .dark:
+            return brightness < 0.2
+        @unknown default:
+            return false
         }
-
-        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }

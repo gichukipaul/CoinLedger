@@ -40,6 +40,7 @@ final class LoadingStateView: UIView {
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         retryButton.translatesAutoresizingMaskIntoConstraints = false
         
+        spinner.color = .systemGreen
         messageLabel.textAlignment = .center
         messageLabel.numberOfLines = 0
         messageLabel.textColor = .secondaryLabel
