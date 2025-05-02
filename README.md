@@ -2,20 +2,20 @@
 An iOS application that displays the top 100 cryptocurrencies from the [CoinRanking API](https://api.coinranking.com/v2), with features like pagination, sorting, filtering, favoriting, and detailed performance charts — built using a blend of **UIKit** and **SwiftUI**.
 ## Previews
 <div style="display:flex; justify-content:center;">
-  <img src="" alt="Light Mode Screenshot 1" width="220" style="margin-right: 25px;"/>
+  <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/l1.png" alt="Light Mode Screenshot 1" width="220" style="margin-right: 25px;"/>
 
-  <img src="" alt="Light Mode Screenshot 2" width="220" style="margin-right: 25px;"/>
+  <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/l2.png" alt="Light Mode Screenshot 2" width="220" style="margin-right: 25px;"/>
 
-  <img src="" alt="Light Mode Screenshot 3" width="220" />
+  <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/l3.png" alt="Light Mode Screenshot 3" width="220" />
 </div>
 <br>
 
 <div style="display:flex; justify-content:center;">
-  <img src="" alt="Dark Mode Screenshot 1" width="220" style="margin-right: 25px;"/>
+  <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/d1.png" alt="Dark Mode Screenshot 1" width="220" style="margin-right: 25px;"/>
 
-  <img src="" alt="Dark Mode Screenshot 2" width="220" style="margin-right: 25px;"/>
+  <img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/d2.png" alt="Dark Mode Screenshot 2" width="220" style="margin-right: 25px;"/>
 
-<img src="" alt="Dark Mode Screenshot 3" width="220" />
+<img src="https://github.com/gichukipaul/CoinLedger/blob/main/screenshots/d3.png" alt="Dark Mode Screenshot 3" width="220" />
 </div>
 
 ## 📱 Features
